@@ -1,11 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { uploadFile } from '../apis/file';
 
 function ImageUploadBtn({
     id = "image-upload-btn",
     name = "files[]",
-    callbackBeforeUpload
+    callbackBeforeUpload,
+    callbackAfterUpload
 }) {
+    const fileInput = useRef();
+    const idx = useRef(0);
     const CAPTIONS = {
         ready: "클릭하여 업로드",
     };
@@ -47,13 +51,17 @@ function ImageUploadBtn({
         const files = e.target.files;
         uploadFiles(files);
     }
-    const uploadFiles = (files) => {
-        const formData = new FormData();
+    const uploadFiles = async (files) => {
         const len = files.length;
         for (let i = 0; i < len; i++) {
             const currentFile = files[i];
-            callbackBeforeUpload(currentFile);
+            const id = idx.current;
+            callbackBeforeUpload && callbackBeforeUpload(currentFile, id);
+            const res = await uploadFile(currentFile);
+            callbackAfterUpload && callbackAfterUpload(id, res.data.src, res.data.attachment_id);
+            idx.current++;
         }
+        fileInput.current.value = "";
     }
     useEffect(() => {
         //기능이 있는지 확인합니다.
@@ -89,7 +97,7 @@ function ImageUploadBtn({
                     <img className="icon" src="/images/file_upload_icon.png" />
                     <div className="caption">{state.caption}</div>
                 </label>
-                <input type="file" name={name} id={id} multiple accept="image/*" onInput={onInput} />
+                <input ref={fileInput} type="file" name={name} id={id} multiple accept="image/*" onInput={onInput} />
             </div>
         </StyledImageUploadBtnContainer >
     );

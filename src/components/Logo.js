@@ -13,10 +13,5 @@ function Logo() {
 export default Logo;
 
 const StyledLogo = styled.img`
-
     height:3.6rem;
-
-    @media screen and (min-width:${props => props.theme.mobileBreakPoint}px){
-        height: 6rem;
-    }
 `;

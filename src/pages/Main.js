@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Tag from '../components/Tag';
+import { readIWC } from '../apis/iwc';
+import IWC from '../components/IWC';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../redux/global';
 
 function makeTagObject(label, checked = false) {
     return {
@@ -20,13 +24,39 @@ function Main() {
         makeTagObject("#내_친구가_만든_월드컵"),
     ];
     const INITIAL_STATE = {
-        tagList: TAG_LIST
+        tagList: TAG_LIST,
+        loading: false,
+        data: null,
+        error: false,
     };
-    const [state] = useState(INITIAL_STATE);
+    const [state, setState] = useState(INITIAL_STATE);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        if (state.data === null) {
+            setState(s => ({
+                ...s,
+                loading: true,
+            }));
+        }
+        if (state.loading) {
+            (async () => {
+                const IWCs = await readIWC({});
+                setState(s => ({
+                    ...s,
+                    loading: false,
+                    data: IWCs.data,
+                }));
+                dispatch(setLoading(false));
+            })();
+        }
+    }, [state.loading]);
     return (
         <StyledMain>
             <div className="tag-container">
                 {state.tagList.map((tag, idx) => <Tag key={idx} label={tag.label} />)}
+            </div>
+            <div className="iwc-list">
+                {state.data?.posts.map(x => <IWC />)}
             </div>
         </StyledMain>
     );

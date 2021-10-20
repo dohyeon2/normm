@@ -27,6 +27,7 @@ const StyledAppbar = styled.div`
     position:sticky;
     border-radius:0 0 1.2rem 1.2rem;
     background-color: ${props => props.theme.color.background};
+    z-index:99;
     top:0;
 
     /* //min-width 800px

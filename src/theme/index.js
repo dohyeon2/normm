@@ -22,6 +22,7 @@ const defaultTheme = {
         gray800: "#333333",
         gray750: "#595757",
         gray600: "#6B6B6B",
+        danger: "#FF007A",
     },
     borderImage: {
         bottom: `url("/images/border_btn_bottom.png")`

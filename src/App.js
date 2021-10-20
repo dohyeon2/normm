@@ -2,17 +2,17 @@ import Appbar from "./components/Appbar";
 import styled from "styled-components";
 import { ThemeProvider } from "styled-components";
 import {
-  BrowserRouter as Router,
   Switch,
-  Route
+  Route,
+  useLocation,
 } from "react-router-dom";
 import defaultTheme from "./theme";
 import Main from "./pages/Main";
 import Making from "./pages/Making";
+import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
   return (
-    <Router>
       <ThemeProvider theme={defaultTheme}>
         <StyledAppContainer>
           <Appbar />
@@ -26,7 +26,6 @@ function App() {
           </Switch>
         </StyledAppContainer>
       </ThemeProvider>
-    </Router>
   );
 }
 

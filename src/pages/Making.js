@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { createElement, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Container from '../components/Container';
 import Input, { StyledLabel } from '../components/Input';
 import ImageUploadBtn from '../components/ImageUploadBtn';
 import Candidate from '../components/Candidate';
+import { uploadFile } from '../apis/file';
+import { createIWC } from '../apis/iwc';
 
 function Making() {
     const INITIAL_INPUT = {
@@ -11,20 +13,27 @@ function Making() {
         description: "",
         status: "",
         search: "",
-        images: [],
+        candidates: {},
     };
     const INITIAL_IMAGE_OBJ = {
         name: "",
         src: "",
-        state: "loading",
+        state: "",
     };
     const INITIAL_STATE = {
         canSubmit: false,
     };
     const [input, setInput] = useState(INITIAL_INPUT);
     const [state, setState] = useState(INITIAL_STATE);
-    const submitEventHandler = (e) => {
+    const submitEventHandler = async (e) => {
         e.preventDefault();
+        const requestData = {
+            title: input.title,
+            description: input.description,
+            status: input.status,
+            candidates: Object.values(input.candidates).map(x => x.attachment_id),
+        };
+        const res = await createIWC(requestData);
     }
     const onInput = (e) => {
         const curr = e.target;
@@ -33,21 +42,36 @@ function Making() {
             [curr.name]: curr.value,
         }));
     }
-    const callbackBeforeUpload = (file) => {
-        const name = file.name.split(".").slice(0, -1);
+    const callbackBeforeUpload = async (file, id) => {
+        const name = file.name.split(".").slice(0, -1)[0];
         const src = URL.createObjectURL(file);
         const obj = {
             ...INITIAL_IMAGE_OBJ,
+            id: id,
             name: name,
             src: src,
-            status: "uploading",
+            state: "uploading",
         }
         setInput(s => ({
             ...s,
-            images: [
-                ...s.images,
-                obj,
-            ]
+            candidates: {
+                ...s.candidates,
+                [id]: obj,
+            }
+        }));
+    };
+    const callbackAfterUpload = (id, src, attachment_id) => {
+        setInput(s => ({
+            ...s,
+            candidates: {
+                ...s.candidates,
+                [id]: {
+                    ...s.candidates[id],
+                    attachment_id: attachment_id,
+                    src: src,
+                    state: "uploaded",
+                }
+            }
         }));
     };
     const onInputSearch = (e) => {
@@ -57,14 +81,26 @@ function Making() {
             [curr.name]: curr.value,
         }));
     };
+    const changeImage = (id) => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.oninput = async (e) => {
+            const file = e.target.files[0];
+            callbackBeforeUpload(file, id);
+            const res = await uploadFile(file);
+            callbackAfterUpload(id, res.data.src, res.data.attachment_id);
+            input.remove();
+        }
+        input.click();
+    }
     const validateHandler = (key, value) => {
         let result = true;
-        console.log(value);
         switch (key) {
             case "search":
                 break;
-            case "images":
-                if (value.length < 4) result = false;
+            case "candidates":
+                if (Object.values(value).filter(x => x.state === "uploaded").length < 4) result = false;
                 break;
             case "status":
                 if (value === "") result = false;
@@ -88,6 +124,28 @@ function Making() {
         }
         return result;
     }
+    const nameChangeHandler = (e, id) => {
+        const curr = e.target;
+        const value = curr.value;
+        setInput(s => ({
+            ...s,
+            candidates: {
+                ...s.candidates,
+                [id]: {
+                    ...s.candidates[id],
+                    name: value,
+                }
+            }
+        }));
+    }
+    const deleteHandler = (id) => {
+        const temp = { ...input.candidates };
+        delete temp[id];
+        setInput(s => ({
+            ...s,
+            candidates: temp,
+        }));
+    }
     useEffect(() => {
         if (validateInput(input, validateHandler)) {
             setState(s => ({
@@ -100,24 +158,40 @@ function Making() {
                 canSubmit: false,
             }));
         }
+
     }, [input]);
     return (
         <StyledMaking>
             <Container>
-                <Input id="title" name="title" label={"제목"} placeholder={"제목 작성"} required={true} value={input.title} onInput={onInput} />
-                <Input id="description" name="description" label={"설명"} placeholder={"설명 작성"} required={true} value={input.description} onInput={onInput} />
-                <Input type="radio" id="status" name="status" label={"공개 여부 설정"} placeholder={"설명 작성"} value={input.status} data={[
-                    { label: "공개", value: "public" },
-                    { label: "일부 공개", value: "unlisted" },
-                    { label: "비공개", value: "secret" },
+                <Input id="title" name="title" label={"제목"} placeholder={"제목 작성(8자 이상)"} required={true} value={input.title} onInput={onInput} />
+                <Input id="description" name="description" label={"설명"} placeholder={"설명 작성(8자 이상)"} required={true} value={input.description} onInput={onInput} />
+                <Input type="radio" id="status" name="status" label={"공개 여부 설정"} value={input.status} data={[
+                    { label: "공개", value: "publish" },
+                    { label: "일부 공개", value: "draft" },
+                    { label: "비공개", value: "pending" },
                 ]} required={true} onInput={onInput} />
-                <StyledLabel className="custom-label">이미지 업로드</StyledLabel>
-                <ImageUploadBtn callbackBeforeUpload={callbackBeforeUpload} />
-                {input.images.length !== 0 && <>
+                <StyledLabel className="custom-label">이미지 업로드 (현재 {Object.values(input.candidates).length}개/최소 4개)</StyledLabel>
+                <ImageUploadBtn callbackBeforeUpload={callbackBeforeUpload} callbackAfterUpload={callbackAfterUpload} />
+                {Object.values(input.candidates).length !== 0 && <>
                     <Input addClassList={["input-search"]} theme="search" id="search" name="search" placeholder={"검색"} required={true} value={input.search} onInput={onInputSearch} />
                     <div className="list">
-                        {input.images.filter(x => (input.search !== "" ? x.name.includes(input.search) : true)).map((candidate, idx) =>
-                            <Candidate status={candidate.status} key={idx} theme="making" src={candidate.src} name={candidate.name} />)}
+                        {Object.values(input.candidates).filter(x => (input.search !== "" ? x.name.includes(input.search) : (x !== null))).map(candidate =>
+                            <Candidate
+                                state={candidate.state}
+                                key={candidate.id}
+                                theme="making"
+                                src={candidate.src}
+                                name={candidate.name}
+                                nameChangeHandler={(e) => {
+                                    nameChangeHandler(e, candidate.id);
+                                }}
+                                imageChangeHandler={() => {
+                                    changeImage(candidate.id);
+                                }}
+                                deleteHandler={() => {
+                                    deleteHandler(candidate.id);
+                                }}
+                            />)}
                     </div>
                 </>}
                 <button className={["submit-btn", (state.canSubmit ? "can-submit" : null)].join(" ")} type="submit" onClick={submitEventHandler}>
@@ -146,6 +220,11 @@ const StyledMaking = styled.div`
             display:flex;
             flex-wrap:wrap;
             margin:0 -2rem;
+            @media screen and (min-width:1280px){
+                .candidate{
+                    width: calc(50% - 4rem);
+                }
+            }
         }
         .custom-label{
             display:block;
