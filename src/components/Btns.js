@@ -1,6 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 
+export function ShareBtn({
+    shareContent
+}) {
+    const shareContentCopy = () => {
+        navigator.clipboard.writeText(shareContent);
+        window.alert("클립보드에 주소가 복사됐습니다.\n원하는 곳에 붙여넣기 하세요.");
+    }
+    return (<StyledShareBtn onClick={shareContentCopy}>
+        <img src="/images/share_icon.png" />
+    </StyledShareBtn>);
+}
+
 export function RoundBtn({
     children,
     classList,
@@ -23,7 +35,9 @@ export function IconBtn({
 }) {
     const ICON = {
         "like": "/images/heart_icon.png",
-        "comment": "/images/comment_icon.png"
+        "comment": "/images/comment_icon.png",
+        "play": "/images/play_icon.png",
+        "report": "/images/report_icon.png"
     };
     if (!ICON[iconType]) return null;
     return (<StyledIconBtn onClick={onClick} color={color}>
@@ -37,6 +51,14 @@ const Btns = {
 }
 
 export default Btns;
+
+const StyledShareBtn = styled.button`
+    padding:0;
+    margin:0;
+    border:0;
+    background-color: transparent;
+    cursor: pointer;
+`;
 
 const StyledRoundBtn = styled.button`
     color:${props => props.theme.color.foreground};
@@ -57,6 +79,7 @@ const StyledRoundBtn = styled.button`
 `;
 
 const StyledIconBtn = styled.button`
+    cursor:pointer;
     display: flex;
     align-items: center;
     background-color: transparent;

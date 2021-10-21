@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { IconBtn } from './Btns';
+import { Author } from './Profile';
 
 export function Thumbnail({
     onClick,
@@ -34,12 +35,7 @@ function IWC({
             <StyledTitle>{title}</StyledTitle>
             <div className="info">
                 <div className="left">
-                    <div className="author">
-                        <div className="author-img" style={{
-                            backgroundImage: `url("${author.image}")`
-                        }} />
-                        <div className="author-name">{author.name}</div>
-                    </div>
+                    <Author {...author}/>
                 </div>
                 <div className="right">
                     <div className="data">
@@ -102,22 +98,6 @@ const StyledIWCItem = styled.div`
         padding:0.25rem;
         display: flex;
         justify-content: space-between;
-        .author{
-            display: flex;
-            align-items: center;
-        }
-        .author-img{
-            width:32px;
-            height:32px;
-            border-radius: 99px;
-            background-color: ${props => props.theme.color.gray100};
-            margin-right:0.65rem;
-        }
-        .author-name{
-            font-size:${props => props.theme.font.size.paragraph2};
-            font-weight:${props => props.theme.font.weight.bold};
-            color:${props => props.theme.color.gray100};
-        }
         .right .data{
             display: flex;
             align-items: center;

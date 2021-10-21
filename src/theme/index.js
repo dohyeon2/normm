@@ -32,6 +32,8 @@ const defaultTheme = {
         bottom: `url("/images/border_btn_bottom.png")`,
         bottomLeft: `url("/images/border_btn_bottom_left.png")`,
         bottomRight: `url("/images/border_btn_bottom_right.png")`,
+        left: `url("/images/border_btn_left.png")`,
+        right: `url("/images/border_btn_right.png")`,
     }
 };
 

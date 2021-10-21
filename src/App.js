@@ -16,7 +16,7 @@ function App() {
   const { globalReducer: global } = useSelector(s => s);
   return (
     <ThemeProvider theme={defaultTheme}>
-      <StyledAppContainer>
+      <StyledAppContainer id="app">
         <Appbar />
         <Switch>
           <Route path="/making">

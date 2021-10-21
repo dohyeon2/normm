@@ -1,6 +1,18 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+export function Author({
+    image,
+    name,
+}) {
+    return (<StyledAuthor>
+        <div className="author-img" style={{
+            backgroundImage: `url("${image}")`
+        }} />
+        <div className="author-name">{name}</div>
+    </StyledAuthor>);
+}
+
 function Profile() {
     const INITIAL_STATE = {
         image: "/images/default_profile.png",
@@ -20,6 +32,23 @@ function Profile() {
 }
 
 export default Profile;
+
+const StyledAuthor = styled.div`
+    display: flex;
+    align-items: center;
+    .author-img{
+        width:32px;
+        height:32px;
+        border-radius: 99px;
+        background-color: ${props => props.theme.color.gray100};
+        margin-right:0.65rem;
+    }
+    .author-name{
+        font-size:${props => props.theme.font.size.paragraph2};
+        font-weight:${props => props.theme.font.weight.bold};
+        color:${props => props.theme.color.gray100};
+    }
+`;
 
 const StyledProfile = styled.div`
     display: flex;

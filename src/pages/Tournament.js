@@ -47,9 +47,6 @@ function Tournament() {
                 }));
             }
         })();
-        if (state.data?.tournament?.is_done) {
-            setLoading(true);
-        }
         return () => {
             clearInterval(intervalHandler.current);
             clearInterval(timeoutHandler.current);
@@ -78,13 +75,15 @@ function Tournament() {
     }
     const setPick = async (side) => {
         const sideIdx = side === "right" ? 1 : 0;
-        // const winner = competitors[sideIdx];
         setMatch(s => ({
             ...s,
             winnerSide: side,
         }));
         updateTournament(id, sideIdx);
         timeoutHandler.current = setTimeout(() => {
+            if (state.data.tournament.is_final_match) {
+                setLoading(true);
+            }
             setimageLoaded(false);
             clearTimeout(timeoutHandler.current);
             timeoutHandler.current = setTimeout(() => {
