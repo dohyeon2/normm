@@ -37,7 +37,7 @@ const StyledLoadingContainer = styled.div`
     left:0;
     bottom:0;
     right:0;
-    transition: opacity .5s ease-in-out;
+    transition: opacity .4s ease-in-out;
     opacity: 0;
     pointer-events: none;
     background-color: ${props => props.theme.color.primary};

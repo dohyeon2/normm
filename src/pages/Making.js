@@ -6,9 +6,7 @@ import ImageUploadBtn from '../components/ImageUploadBtn';
 import Candidate from '../components/Candidate';
 import { uploadFile } from '../apis/file';
 import { createIWC } from '../apis/iwc';
-import { useDispatch } from 'react-redux';
-import { setLoading } from '../redux/global';
-
+import useLoading from '../hook/useLoading';
 
 function Making() {
     const INITIAL_INPUT = {
@@ -26,9 +24,9 @@ function Making() {
     const INITIAL_STATE = {
         canSubmit: false,
     };
+    const { setLoading } = useLoading();
     const [input, setInput] = useState(INITIAL_INPUT);
     const [state, setState] = useState(INITIAL_STATE);
-    const dispatch = useDispatch();
     const submitEventHandler = async (e) => {
         e.preventDefault();
         const requestData = {
@@ -162,7 +160,7 @@ function Making() {
                 canSubmit: false,
             }));
         }
-        dispatch(setLoading(false));
+        setLoading(false);
     }, [input]);
     return (
         <StyledMaking>
@@ -214,13 +212,12 @@ export const StyledSubmitBtn = styled.button`
         bottom:0;
         align-items: center;
         justify-content: center;
-        width: calc(100% + 2.8rem);
+        width: 100%;
         height:7rem;
         border:0;
         padding:0;
         background-color:transparent;
         border-radius:0 0 1.6rem 1.6rem;
-        margin:0 -1.4rem -1.4rem;
         font-size:${props => props.theme.font.size.paragraph4};
         font-weight:${props => props.theme.font.weight.bold};
         color:${props => props.theme.color.gray800};
@@ -254,6 +251,10 @@ const StyledMaking = styled.div`
     margin-top: -1.5rem;
     .input{
         margin-bottom:2rem;
+    }
+    .submit-btn{
+        width: calc(100% + 2.8rem);
+        margin:0 -1.4rem -1.4rem;
     }
     .container:first-of-type{
         display: flex;

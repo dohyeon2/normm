@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import CustomLink from './CustomLink';
 
 function Logo() {
     return (
-        <Link to="/">
+        <CustomLink to="/">
             <StyledLogo src="/images/logo.png" alt="normm" />
-        </Link>
+        </CustomLink>
     );
 }
 

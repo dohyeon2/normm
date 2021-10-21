@@ -3,6 +3,7 @@ const defaultTheme = {
     font: {
         family: "'NanumSquare', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
         weight: {
+            extraBold: 800,
             bold: 700,
             regular: 400,
         },
@@ -28,7 +29,9 @@ const defaultTheme = {
         danger: "#FF007A",
     },
     borderImage: {
-        bottom: `url("/images/border_btn_bottom.png")`
+        bottom: `url("/images/border_btn_bottom.png")`,
+        bottomLeft: `url("/images/border_btn_bottom_left.png")`,
+        bottomRight: `url("/images/border_btn_bottom_right.png")`,
     }
 };
 

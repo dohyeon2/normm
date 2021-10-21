@@ -4,25 +4,16 @@ import { ThemeProvider } from "styled-components";
 import {
   Switch,
   Route,
-  useHistory
 } from "react-router-dom";
 import defaultTheme from "./theme";
 import Main from "./pages/Main";
 import Making from "./pages/Making";
-import { useEffect } from "react";
 import Loading from "./components/Loading";
-import { useDispatch, useSelector } from 'react-redux';
-import { setLoading } from './redux/global';
+import { useSelector } from 'react-redux';
+import Tournament from './pages/Tournament';
 
 function App() {
-  const history = useHistory();
   const { globalReducer: global } = useSelector(s => s);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    history.listen((location, action) => {
-      dispatch(setLoading(true));
-    });
-  }, []);
   return (
     <ThemeProvider theme={defaultTheme}>
       <StyledAppContainer>
@@ -30,6 +21,9 @@ function App() {
         <Switch>
           <Route path="/making">
             <Making />
+          </Route>
+          <Route path="/tournament/:id">
+            <Tournament />
           </Route>
           <Route path="/">
             <Main />
@@ -49,5 +43,7 @@ const StyledAppContainer = styled.div`
   width:100%;
   height:100%;
   font-size:10px;
+  display:flex;
+  flex-direction: column;
   background-color:${props => props.theme.color.background};
 `;

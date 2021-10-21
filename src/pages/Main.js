@@ -3,10 +3,11 @@ import styled from 'styled-components';
 import Tag from '../components/Tag';
 import { readIWC } from '../apis/iwc';
 import IWC from '../components/IWC';
-import { useDispatch } from 'react-redux';
-import { setLoading } from '../redux/global';
 import { useHistory } from 'react-router';
 import IWCmodal from '../components/Modal';
+import useLoading from '../hook/useLoading';
+import useTournament from '../hook/useTournament';
+import useRedirect from '../hook/useRedirect';
 
 function makeTagObject(label, checked = false) {
     return {
@@ -16,6 +17,9 @@ function makeTagObject(label, checked = false) {
 }
 
 function Main() {
+    const { setLoading } = useLoading();
+    const { setPush } = useRedirect();
+    const { generateIWCTournament } = useTournament();
     const TAG_LIST = [
         makeTagObject("#랜덤"),
         makeTagObject("#인기순"),
@@ -33,7 +37,6 @@ function Main() {
         popup: false,
     };
     const [state, setState] = useState(INITIAL_STATE);
-    const dispatch = useDispatch();
     const history = useHistory();
     const onPopup = (e, IWC) => {
         setState(s => ({
@@ -47,8 +50,9 @@ function Main() {
             popup: false,
         }))
     }
-    const onSelect = (idx) => {
-
+    const startTournament = async (idx, round) => {
+        const res = await generateIWCTournament(idx, round);
+        setPush('/tournament/' + res.data.tournament_id);
     }
     useEffect(() => {
         if (state.data === null) {
@@ -56,6 +60,7 @@ function Main() {
                 ...s,
                 loading: true,
             }));
+            setLoading(true);
         }
         if (state.loading) {
             (async () => {
@@ -65,21 +70,21 @@ function Main() {
                     loading: false,
                     data: IWCs.data,
                 }));
+                setLoading(false);
             })();
-            dispatch(setLoading(false));
         } else {
-            dispatch(setLoading(false));
+            setLoading(false);
         }
     }, [state.loading, history.location.key]);
     return (
         <StyledMain>
             <div className="tag-container">
-                {state.tagList.map((tag, idx) => <Tag key={idx} label={tag.label} />)}
+                {state.tagList?.map((tag, idx) => <Tag key={idx} label={tag.label} />)}
             </div>
             <div className="iwc-list">
-                {state.data?.posts.map(x => <IWC {...x} onClick={(e) => { onPopup(e, x) }} />)}
+                {state.data?.posts?.map(x => <IWC key={x.id} {...x} onClick={(e) => { onPopup(e, x) }} />)}
             </div>
-            {state.popup && <IWCmodal {...state.popup} closeModal={closePopup} />}
+            {state.popup && <IWCmodal {...state.popup} closeModal={closePopup} startTournament={startTournament} />}
         </StyledMain>
     );
 }
