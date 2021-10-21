@@ -1,5 +1,5 @@
 const INITIAL_STATE = {
-    loading: false,
+    loading: true,
 };
 
 const SET_LOADING = 'global/SET_LOADING';

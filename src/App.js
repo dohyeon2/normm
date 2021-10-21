@@ -4,28 +4,40 @@ import { ThemeProvider } from "styled-components";
 import {
   Switch,
   Route,
-  useLocation,
+  useHistory
 } from "react-router-dom";
 import defaultTheme from "./theme";
 import Main from "./pages/Main";
 import Making from "./pages/Making";
+import { useEffect } from "react";
+import Loading from "./components/Loading";
 import { useDispatch, useSelector } from 'react-redux';
+import { setLoading } from './redux/global';
 
 function App() {
+  const history = useHistory();
+  const { globalReducer: global } = useSelector(s => s);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    history.listen((location, action) => {
+      dispatch(setLoading(true));
+    });
+  }, []);
   return (
-      <ThemeProvider theme={defaultTheme}>
-        <StyledAppContainer>
-          <Appbar />
-          <Switch>
-            <Route path="/making">
-              <Making />
-            </Route>
-            <Route path="/">
-              <Main />
-            </Route>
-          </Switch>
-        </StyledAppContainer>
-      </ThemeProvider>
+    <ThemeProvider theme={defaultTheme}>
+      <StyledAppContainer>
+        <Appbar />
+        <Switch>
+          <Route path="/making">
+            <Making />
+          </Route>
+          <Route path="/">
+            <Main />
+          </Route>
+        </Switch>
+        {<Loading loading={global.loading} />}
+      </StyledAppContainer>
+    </ThemeProvider>
   );
 }
 

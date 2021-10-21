@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 function Logo() {
     return (
-        <Link to={"/"}>
+        <Link to="/">
             <StyledLogo src="/images/logo.png" alt="normm" />
         </Link>
     );

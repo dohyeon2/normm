@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-function Loading({ loading }) {
+function Loading({ loading = true }) {
     const lottieContainer = useRef();
     const animation = useRef();
     const classList = [];
@@ -44,6 +44,7 @@ const StyledLoadingContainer = styled.div`
     z-index:999;
     .lottie-container{
         max-width: 300px;
+        width: 100%;
         max-height: 300px;
     }
     &.loading{

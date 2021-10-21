@@ -9,7 +9,8 @@ const defaultTheme = {
         size: {
             paragraph: "1.2rem",
             paragraph2: "1.4rem",
-            paragraph3: "2.4rem",
+            paragraph3: "1.8rem",
+            paragraph4: "2.4rem",
         }
     },
     color: {
@@ -18,10 +19,12 @@ const defaultTheme = {
         foreground: "#FFFFFF",
         primary: "#8400FF",
         textPrimary: "#9B33FF",
+        secondary: "#DCBBFF",
         gray850: "#1c1c1c",
         gray800: "#333333",
         gray750: "#595757",
         gray600: "#6B6B6B",
+        gray100: "#C8C9CA",
         danger: "#FF007A",
     },
     borderImage: {

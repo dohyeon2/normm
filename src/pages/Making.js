@@ -6,6 +6,9 @@ import ImageUploadBtn from '../components/ImageUploadBtn';
 import Candidate from '../components/Candidate';
 import { uploadFile } from '../apis/file';
 import { createIWC } from '../apis/iwc';
+import { useDispatch } from 'react-redux';
+import { setLoading } from '../redux/global';
+
 
 function Making() {
     const INITIAL_INPUT = {
@@ -25,6 +28,7 @@ function Making() {
     };
     const [input, setInput] = useState(INITIAL_INPUT);
     const [state, setState] = useState(INITIAL_STATE);
+    const dispatch = useDispatch();
     const submitEventHandler = async (e) => {
         e.preventDefault();
         const requestData = {
@@ -158,7 +162,7 @@ function Making() {
                 canSubmit: false,
             }));
         }
-
+        dispatch(setLoading(false));
     }, [input]);
     return (
         <StyledMaking>
@@ -194,15 +198,56 @@ function Making() {
                             />)}
                     </div>
                 </>}
-                <button className={["submit-btn", (state.canSubmit ? "can-submit" : null)].join(" ")} type="submit" onClick={submitEventHandler}>
+                <StyledSubmitBtn className={["submit-btn", (state.canSubmit ? "can-submit" : null)].join(" ")} type="submit" onClick={submitEventHandler}>
                     <span>등록하기</span>
-                </button>
+                </StyledSubmitBtn>
             </Container>
         </StyledMaking >
     );
 }
 
 export default Making;
+
+export const StyledSubmitBtn = styled.button`
+        display: flex;
+        position:sticky;
+        bottom:0;
+        align-items: center;
+        justify-content: center;
+        width: calc(100% + 2.8rem);
+        height:7rem;
+        border:0;
+        padding:0;
+        background-color:transparent;
+        border-radius:0 0 1.6rem 1.6rem;
+        margin:0 -1.4rem -1.4rem;
+        font-size:${props => props.theme.font.size.paragraph4};
+        font-weight:${props => props.theme.font.weight.bold};
+        color:${props => props.theme.color.gray800};
+        cursor: not-allowed;
+        border-top:1px solid ${props => props.theme.color.gray800};
+        background-color:${props => props.theme.color.gray850};
+        box-sizing:border-box;
+        span{
+            position: relative;
+        }
+        &.can-submit{
+            cursor: pointer;
+            span{
+                color:${props => props.theme.color.foreground};
+            }
+            &::before{
+                content:"";
+                position: absolute;
+                left:0;
+                bottom:0;
+                top:0;
+                right:0;
+                box-sizing:border-box;
+                border-image:${props => props.theme.borderImage.bottom} 27 fill / 27px;
+            }
+        }
+`;
 
 const StyledMaking = styled.div`
     padding:1.5rem;
@@ -229,45 +274,6 @@ const StyledMaking = styled.div`
         .custom-label{
             display:block;
         }
-        .submit-btn{
-            display: flex;
-            position:sticky;
-            bottom:0;
-            align-items: center;
-            justify-content: center;
-            width: calc(100% + 2.8rem);
-            height:7rem;
-            border:0;
-            padding:0;
-            background-color:transparent;
-            border-radius:0 0 1.6rem 1.6rem;
-            margin:0 -1.4rem -1.4rem;
-            font-size:${props => props.theme.font.size.paragraph3};
-            font-weight:${props => props.theme.font.weight.bold};
-            color:${props => props.theme.color.gray800};
-            cursor: not-allowed;
-            border-top:1px solid ${props => props.theme.color.gray800};
-            background-color:${props => props.theme.color.gray850};
-            box-sizing:border-box;
-            span{
-                position: relative;
-            }
-            &.can-submit{
-                cursor: pointer;
-                span{
-                    color:${props => props.theme.color.foreground};
-                }
-                &::before{
-                    content:"";
-                    position: absolute;
-                    left:0;
-                    bottom:0;
-                    top:0;
-                    right:0;
-                    box-sizing:border-box;
-                    border-image:${props => props.theme.borderImage.bottom} 27 fill / 27px;
-                }
-            }
-        }
+        
     }
 `;
