@@ -8,28 +8,33 @@ import {
 import defaultTheme from "./theme";
 import Main from "./pages/Main";
 import Making from "./pages/Making";
-import Loading from "./components/Loading";
-import { useSelector } from 'react-redux';
 import Tournament from './pages/Tournament';
+import Loading from "./components/Loading";
+import GlobalComponents from "./components/GlobalComponents";
 
 function App() {
-  const { globalReducer: global } = useSelector(s => s);
   return (
     <ThemeProvider theme={defaultTheme}>
       <StyledAppContainer id="app">
         <Appbar />
         <Switch>
+          <Route path="/making/:id">
+            <Making />
+          </Route>
           <Route path="/making">
             <Making />
           </Route>
           <Route path="/tournament/:id">
             <Tournament />
           </Route>
+          <Route path="/loading">
+            <Loading />
+          </Route>
           <Route path="/">
             <Main />
           </Route>
         </Switch>
-        {<Loading loading={global.loading} />}
+        <GlobalComponents />
       </StyledAppContainer>
     </ThemeProvider>
   );

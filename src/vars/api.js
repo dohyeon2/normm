@@ -1,10 +1,15 @@
 const DATA_HOST = "https://data.normm.me/wp-json/normm/v1";
 const FILE = "/file";
 const IWC = "/iwc";
-const IWCTournament = "/tournament";
+const IWC_TOURNAMENT = "/tournament";
+const COMMENT = "/comment";
+const CANDIDATE = "/candidate";
+
 const API = {
     file: DATA_HOST + FILE,
     IWC: DATA_HOST + IWC,
-    IWCTournament: DATA_HOST + IWCTournament
+    IWCTournament: DATA_HOST + IWC_TOURNAMENT,
+    comment: DATA_HOST + COMMENT,
+    candidate: DATA_HOST + CANDIDATE,
 }
 export default API;

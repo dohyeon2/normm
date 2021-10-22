@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 export function ShareBtn({
-    shareContent
+    shareContent,
 }) {
     const shareContentCopy = () => {
         navigator.clipboard.writeText(shareContent);
@@ -88,6 +88,7 @@ const StyledIconBtn = styled.button`
     margin:0;
     .icon{
         margin-right: 0.6rem;
+        height:18px;
     }
     .content{
         color:${props => props.theme.color[props.color]};
@@ -95,4 +96,8 @@ const StyledIconBtn = styled.button`
         font-family:${props => props.theme.font.family};
         font-weight:${props => props.theme.font.weight.regular};
     }
+`;
+
+export const StyledTransprentBtn = styled(StyledRoundBtn)`
+    background-color:transparent;
 `;

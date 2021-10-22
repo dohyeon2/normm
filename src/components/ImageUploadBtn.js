@@ -5,11 +5,12 @@ import { uploadFile } from '../apis/file';
 function ImageUploadBtn({
     id = "image-upload-btn",
     name = "files[]",
+    startId = 0,
     callbackBeforeUpload,
     callbackAfterUpload
 }) {
     const fileInput = useRef();
-    const idx = useRef(0);
+    const idx = useRef(startId);
     const CAPTIONS = {
         ready: "클릭하여 업로드",
     };

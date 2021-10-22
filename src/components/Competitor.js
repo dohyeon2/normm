@@ -1,4 +1,6 @@
 import React from 'react';
+import ShiningEffect from '../components/Effect';
+import { ImageEnlargeModal } from './Modal';
 import styled from 'styled-components';
 import { StyledSubmitBtn } from '../pages/Making';
 
@@ -8,38 +10,45 @@ function Competitor({
     side,
     winnerSide,
     imageReadyHandler,
-    setPopup = () => { },
     setPick = () => { }
 }) {
     const pickBtnClickHandler = () => {
         !winnerSide && setPick(side);
     }
-    const imageClickHandler = () => {
-        !winnerSide && setPopup(true, { src: src, name: name })
-    }
+
     const competitorClass = ["competitor", (side ? `side-${side}` : "")];
     const pickBtnClass = ["can-submit", (side ? `side-${side}` : "")];
+    let winner = false;
     if (winnerSide !== null) {
         if (winnerSide === side) {
+            winner = true;
             competitorClass.push("winner");
         } else {
+            winner = false;
             competitorClass.push("loser");
         }
     }
     return (
         <StyledCompetitor className={competitorClass.join(" ")}>
-            <div className='image'
-                style={{
-                    backgroundImage: `url(${src})`
-                }}
-                onClick={imageClickHandler}
-            >
-                <img className="img-handler" src={src} alt="" onLoad={imageReadyHandler}/>
-                <div className="name">{name}</div>
-            </div>
-            <StyledPickBtn className={pickBtnClass.join(" ")} onClick={pickBtnClickHandler}>
-                <span><img src="/images/pick-btn.png" /></span>
-            </StyledPickBtn>
+            <ImageEnlargeModal src={src} name={name}>
+                <ShiningEffect start={winner} passive={false}>
+                    <div className='image'
+                        style={{
+                            backgroundImage: `url(${src})`
+                        }}
+                    >
+                        <img className="img-handler" src={src} alt="" onLoad={imageReadyHandler} />
+                        <div className="name">{name}</div>
+                    </div>
+                </ShiningEffect>
+            </ImageEnlargeModal>
+            <ShiningEffect start={winner} passive={false}>
+                <StyledPickBtn className={pickBtnClass.join(" ")} onClick={pickBtnClickHandler}>
+                    <span>
+                        <img src={winner ? "/images/winner_btn.png" : "/images/pick-btn.png"} />
+                    </span>
+                </StyledPickBtn>
+            </ShiningEffect>
         </StyledCompetitor>
     );
 }
@@ -50,28 +59,42 @@ const StyledCompetitor = styled.div`
     display:flex;
     flex-direction:column;
     overflow:hidden;
-    transition:filter .2s ease-in-out;
+    transition:filter .4s ease-in-out, width .4s ease-in-out;
     box-sizing:border-box;
+    position:absolute;
+    top:0;
+    bottom:0;
+    width: 50%;
     &.side-right{
+        right:0;
         .image{
             border-radius:0 2.2rem 0 0;
         }
         border-left:2px solid ${props => props.theme.color.primary};
     }
     &.side-left{
+        left:0;
         border-radius:2.2rem 0 0 2.2rem;
         .image{
             border-radius:2.2rem 0 0 0;
         }
         border-right:2px solid ${props => props.theme.color.primary};
     }
+    .side-right{
+        border-radius: 0 0 2.2rem  0;
+    }
+    .side-left{
+        border-radius: 0 0 0 2.2rem;
+    }
     .image{
         transition: filter .2s ease-in-out, border .2s ease-in-out;
         position:relative;
         background-size: cover;
+        background-position:center;
         flex-grow:1;
         cursor:zoom-in;
         box-sizing:border-box;
+        overflow:hidden;
         &.loser{
             filter:brightness(40%);
         }
@@ -79,8 +102,7 @@ const StyledCompetitor = styled.div`
             opacity:0;
             position:absolute;
             width:100%;
-            bottom:0;
-            top:0;
+            height:100%;
         }
         .name{
             position:absolute;
@@ -96,10 +118,27 @@ const StyledCompetitor = styled.div`
     }
     .can-submit{
         transition: filter .2s ease-in-out;
+        overflow:hidden;
+        display:block;
+        span{
+            display:block;
+        }
     }
     &.winner{
+        border:0;
+        border-radius:2.2rem 2.2rem 0 0;
+        z-index:2;
+        width:100%;
         .image{
+            border-radius:2.2rem 2.2rem 0 0;
             border:4px solid ${props => props.theme.color.primary};
+        }
+        .side-right,
+        .side-left{
+            border-radius: 0 0 2.2rem 2.2rem;
+            &::before{
+                border-image:${props => props.theme.borderImage.bottom} 27 fill / 27px;
+            }
         }
     }
     &.loser{

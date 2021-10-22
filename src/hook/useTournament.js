@@ -1,9 +1,17 @@
 import axios from 'axios';
 import API from '../vars/api';
 import useLoading from './useLoading';
+import { useDispatch, useSelector } from 'react-redux';
+import { setTournamentData as setTournament } from '../redux/global';
 
 function useTournament() {
+    const { globalReducer } = useSelector(s => s);
+    const tournamentData = globalReducer.tournamentData;
+    const dispatch = useDispatch();
     const { setLoading } = useLoading();
+    const setTournamentData = (data) => {
+        dispatch(setTournament(data));
+    }
     const generateIWCTournament = async (id, round) => {
         setLoading(true);
         try {
@@ -40,7 +48,7 @@ function useTournament() {
             return e;
         }
     }
-    return { generateIWCTournament, getTournament, updateTournament };
+    return { generateIWCTournament, getTournament, updateTournament, setTournamentData, tournamentData };
 }
 
 export default useTournament;

@@ -6,7 +6,7 @@ function CustomLink({ to, children }) {
     const { setPush } = useRedirect();
     return (
         <StyledCustomLink onClick={() => {
-            setPush(to);
+                setPush(to);
         }}>
             {children}
         </StyledCustomLink>

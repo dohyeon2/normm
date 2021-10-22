@@ -4,12 +4,11 @@ import useTournament from '../hook/useTournament';
 import useLoading from '../hook/useLoading';
 import styled from 'styled-components';
 import Competitor from '../components/Competitor';
-import { CompetitorModal } from '../components/Modal';
-import Statistic from '../components/Statistic';
+import Statistic from './Statistic';
 
 function Tournament() {
     const { id } = useParams();
-    const { getTournament, updateTournament } = useTournament();
+    const { getTournament, updateTournament, setTournamentData, tournamentData  } = useTournament();
     const { setLoading } = useLoading();
     const timedout = useRef(false);
     const timeoutHandler = useRef(null);
@@ -19,15 +18,10 @@ function Tournament() {
         data: null,
         error: false,
     }
-    const INITIAL_POPUP = {
-        on: false,
-        data: null,
-    }
     const INITIAL_MATCH = {
         winnerSide: null,
     };
     const [state, setState] = useState(INITIAL_STATE);
-    const [popup, setPopupState] = useState(INITIAL_POPUP);
     const [match, setMatch] = useState(INITIAL_MATCH);
     const [imageLoaded, setimageLoaded] = useState(false);
     useEffect(() => {
@@ -45,6 +39,7 @@ function Tournament() {
                     loading: false,
                     data: tournament.data,
                 }));
+                setTournamentData(tournament.data);
             }
         })();
         return () => {
@@ -59,16 +54,6 @@ function Tournament() {
     const competitors = state.data.tournament.current_match;
     const leftSideCompetitor = competitors[0];
     const rightSideCompetitor = competitors[1];
-    const setPopup = (on, data) => {
-        setPopupState(s => ({
-            ...s,
-            on: on,
-            data: data,
-        }));
-    }
-    const closePopup = () => {
-        setPopup(false, null);
-    }
     const initialize = () => {
         setMatch(INITIAL_MATCH);
         timedout.current = false;
@@ -109,7 +94,6 @@ function Tournament() {
     }
     const competitiorAttrs = {
         setPick,
-        setPopup,
         winnerSide: match.winnerSide,
         imageReadyHandler
     }
@@ -119,7 +103,6 @@ function Tournament() {
                 <Competitor side={"left"} {...leftSideCompetitor} {...competitiorAttrs} />
                 <Competitor side={"right"} {...rightSideCompetitor} {...competitiorAttrs} />
             </StyledTournament>
-            {popup.on && <CompetitorModal {...popup.data} closeModal={closePopup} />}
         </>
     );
 }
@@ -128,15 +111,18 @@ export default Tournament;
 
 const StyledTournament = styled.div`
     display:flex;
-    padding:2rem;
+    margin:2rem;
+    margin-top:0;
     flex-grow: 1;
     transform:scale(1);
     transition: opacity .5s ease-in-out, transform .5s ease-in-out;
     opacity: 1;
-    .competitor{
+    position:relative;
+    /* .competitor{
+        position:absolute;
         width: 50%;
         height:100%;
-    }
+    } */
     &.loading{
         transition: opacity .5s ease-in-out, transform .5s ease-in-out;
         opacity: 0;

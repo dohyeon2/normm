@@ -1,4 +1,4 @@
-import React, { createElement, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Container from '../components/Container';
 import Input, { StyledLabel } from '../components/Input';
@@ -7,14 +7,22 @@ import Candidate from '../components/Candidate';
 import { uploadFile } from '../apis/file';
 import { createIWC } from '../apis/iwc';
 import useLoading from '../hook/useLoading';
+import { useParams } from 'react-router';
+import useIWC from '../hook/useIWC';
+import useCnadidate from '../hook/useCandidate';
 
 function Making() {
+    const params = useParams();
+    const { getCandidates } = useCnadidate();
+    const { getIWC } = useIWC();
     const INITIAL_INPUT = {
+        IWC_id: 0,
         title: "",
         description: "",
         status: "",
         search: "",
         candidates: {},
+        deletedCandidates: [],
     };
     const INITIAL_IMAGE_OBJ = {
         name: "",
@@ -30,10 +38,15 @@ function Making() {
     const submitEventHandler = async (e) => {
         e.preventDefault();
         const requestData = {
+            IWC_id: input.IWC_id,
             title: input.title,
             description: input.description,
             status: input.status,
-            candidates: Object.values(input.candidates).map(x => x.attachment_id),
+            deletedCandidates: input.deletedCandidates,
+            candidates: Object.values(input.candidates).map(x => ({
+                id: x.attachment_id,
+                title: x.name,
+            })),
         };
         const res = await createIWC(requestData);
     }
@@ -99,7 +112,9 @@ function Making() {
     const validateHandler = (key, value) => {
         let result = true;
         switch (key) {
+            case "IWC_id":
             case "search":
+            case "deletedCandidates":
                 break;
             case "candidates":
                 if (Object.values(value).filter(x => x.state === "uploaded").length < 4) result = false;
@@ -142,13 +157,48 @@ function Making() {
     }
     const deleteHandler = (id) => {
         const temp = { ...input.candidates };
+        const attachment_id = temp[id].attachment_id;
         delete temp[id];
         setInput(s => ({
             ...s,
             candidates: temp,
+            deletedCandidates: [
+                ...s.deletedCandidates,
+                attachment_id,
+            ]
         }));
     }
     useEffect(() => {
+        if (params.id) {
+            (async () => {
+                const id = params.id;
+                const IWC = await getIWC({ id: id });
+                const candidates = await getCandidates({ post_id: id, nopaging: true });
+                setInput(s => ({
+                    ...s,
+                    title: IWC.data.IWC.title,
+                    description: IWC.data.IWC.description,
+                    status: IWC.data.IWC.status,
+                    IWC_id: IWC.data.IWC.id,
+                    candidates: ((candidates) => {
+                        const result = {};
+                        const temp_candidates = candidates;
+                        for (let i = 0, len = candidates.length; i < len; i++) {
+                            const curr = candidates[i];
+                            curr.attachment_id = curr.id;
+                            curr.state = "uploaded";
+                            result[curr.id] = curr;
+                        }
+                        return result;
+                    })(candidates.data.candidates),
+                }));
+            })();
+        }
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        console.log(input);
         if (validateInput(input, validateHandler)) {
             setState(s => ({
                 ...s,
@@ -160,8 +210,8 @@ function Making() {
                 canSubmit: false,
             }));
         }
-        setLoading(false);
     }, [input]);
+
     return (
         <StyledMaking>
             <Container>
@@ -173,10 +223,12 @@ function Making() {
                     { label: "비공개", value: "pending" },
                 ]} required={true} onInput={onInput} />
                 <StyledLabel className="custom-label">이미지 업로드 (현재 {Object.values(input.candidates).length}개/최소 4개)</StyledLabel>
-                <ImageUploadBtn callbackBeforeUpload={callbackBeforeUpload} callbackAfterUpload={callbackAfterUpload} />
+                <ImageUploadBtn startId={Object.keys(input.candidates).length !== 0 ? Math.max(
+                    ...(Object.keys(input.candidates))
+                ) : 0} callbackBeforeUpload={callbackBeforeUpload} callbackAfterUpload={callbackAfterUpload} />
                 {Object.values(input.candidates).length !== 0 && <>
                     <Input addClassList={["input-search"]} theme="search" id="search" name="search" placeholder={"검색"} required={true} value={input.search} onInput={onInputSearch} />
-                    <div className="list">
+                    <StyledList>
                         {Object.values(input.candidates).filter(x => (input.search !== "" ? x.name.includes(input.search) : (x !== null))).map(candidate =>
                             <Candidate
                                 state={candidate.state}
@@ -194,7 +246,7 @@ function Making() {
                                     deleteHandler(candidate.id);
                                 }}
                             />)}
-                    </div>
+                    </StyledList>
                 </>}
                 <StyledSubmitBtn className={["submit-btn", (state.canSubmit ? "can-submit" : null)].join(" ")} type="submit" onClick={submitEventHandler}>
                     <span>등록하기</span>
@@ -262,7 +314,14 @@ const StyledMaking = styled.div`
         .input-search{
             margin-top:2rem;
         }
-        .list{
+        .custom-label{
+            display:block;
+        }
+        
+    }
+`;
+
+export const StyledList = styled.div`
             display:flex;
             flex-wrap:wrap;
             margin:0 -2rem;
@@ -271,10 +330,4 @@ const StyledMaking = styled.div`
                     width: calc(50% - 4rem);
                 }
             }
-        }
-        .custom-label{
-            display:block;
-        }
-        
-    }
 `;

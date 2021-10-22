@@ -1,11 +1,9 @@
 import axios from 'axios';
-import useLoading from './useLoading';
 import API from '../vars/api';
 
 const IWC_API = API.IWC;
 
 function useIWC() {
-    const { setLoading } = useLoading();
     const getIWC = async ({ id = false, query = {} }) => {
         const queryArr = Object.keys(query).map(key => `${key}=${query[key]}`);
         const queryExist = queryArr.length !== 0;

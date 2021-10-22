@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import { Thumbnail, StyledTitle } from './IWC';
 import { StyledSubmitBtn } from '../pages/Making';
 import Select from './Select';
+import useGlobal from '../hook/useGlobal';
 
-export function CompetitorModal({
+export function ImageModal({
     src,
     name,
     closeModal
@@ -153,3 +154,25 @@ const StyledIWCModalConatiner = styled.div`
         }
     }
 `;
+
+export const ImageEnlargeModal = (attr) => {
+    const {
+        children,
+        src,
+        name,
+    } = attr;
+    const { setModal } = useGlobal();
+    const openPopup = () => {
+        setModal(true, src, name);
+    }
+    return ((() => {
+        return React.cloneElement(children, {
+            onClick: openPopup,
+            style: {
+                ...children?.props?.style,
+                cursor: 'zoom-in',
+            }
+        })
+    })()
+    );
+}

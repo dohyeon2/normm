@@ -13,18 +13,24 @@ export function Author({
     </StyledAuthor>);
 }
 
-function Profile() {
+function Profile({
+    onlyImage,
+    size
+}) {
     const INITIAL_STATE = {
         image: "/images/default_profile.png",
         name: "익명",
     };
     const [state] = useState(INITIAL_STATE);
     return (
-        <StyledProfile>
-            <div className="name">
+        <StyledProfile className="profile">
+            {!onlyImage && <div className="name">
                 {state.name}
-            </div>
-            <div className="image">
+            </div>}
+            <div className="image" style={{
+                width:size,
+                height:size,
+            }}>
                 <img src={state.image} alt="" />
             </div>
         </StyledProfile>

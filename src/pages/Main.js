@@ -85,11 +85,32 @@ function Main() {
                 {state.data?.posts?.map(x => <IWC key={x.id} {...x} onClick={(e) => { onPopup(e, x) }} />)}
             </div>
             {state.popup && <IWCmodal {...state.popup} closeModal={closePopup} startTournament={startTournament} />}
+            <StyledFloatBtns>
+                <StyledCircleBtn><img src="/images/search_circle_icon.png" /></StyledCircleBtn>
+                <StyledCircleBtn onClick={() => {
+                    setPush('/making')
+                }}><img src="/images/plus_circle_icon.png" /></StyledCircleBtn>
+            </StyledFloatBtns>
         </StyledMain>
     );
 }
 
 export default Main;
+
+const StyledFloatBtns = styled.div`
+    position:fixed;
+    right: 3rem;
+    bottom:3rem;
+    margin:0 -0.5rem;
+`;
+
+const StyledCircleBtn = styled.button`
+    cursor:pointer;
+    padding:0;
+    background-color: transparent;
+    border:0;
+    margin:0 0.5rem;
+`;
 
 const StyledMain = styled.div`
     padding:1.5rem;

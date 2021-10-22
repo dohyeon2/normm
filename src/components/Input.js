@@ -14,8 +14,30 @@ function Input({
     addClassList = [],
     onInput = () => { }
 }) {
+    const textareaExpand = (e) => {
+        const textarea = e.target;
+        if (textarea.value === "") {
+            textarea.style.height = "1rem";
+        } else {
+            textarea.style.height = "auto";
+            textarea.style.height = (textarea.scrollHeight - 10) + "px";
+        }
+        onInput(e);
+    }
     const classList = ["input", `input-${type}`, ...addClassList];
     switch (theme) {
+        case "readonly":
+            return <StyledInputContainer className={classList}>
+                <StyledLabel htmlFor={id}>{label}</StyledLabel>
+                <div className="value">{value}</div>
+            </StyledInputContainer>;
+        case "textarea":
+            return <StyledInputContainer className={classList}>
+                <StyledLabel htmlFor={id}>{label}</StyledLabel>
+                <textarea value={value} onInput={textareaExpand} style={{
+                    height: '1rem'
+                }}></textarea>
+            </StyledInputContainer>;
         case "search":
             return (<StyledInputContainerSearch className={classList}>
                 <input type="text" placeholder={placeholder} id={id} name={name} onInput={onInput} value={value} />
@@ -27,7 +49,9 @@ function Input({
                     case "radio":
                         return <div className="radio-container">
                             {data.map((v, idx) => <div key={idx}>
-                                <input id={v.id || `${id}-${v.value}`} name={name} type={type} value={v.value} required={required} onInput={onInput} />
+                                <input id={v.id || `${id}-${v.value}`} name={name} type={type} value={v.value} checked={
+                                    value === v.value
+                                } required={required} onChange={onInput} />
                                 <StyledLabel htmlFor={v.id || `${id}-${v.value}`}>
                                     <div className="radio-check-box"></div>
                                     {v.label}
@@ -62,6 +86,8 @@ const StyledInputContainer = styled.div`
     flex-direction: column;
     font-weight:${props => props.theme.font.weight.regular};
     font-family:${props => props.theme.font.family};
+    .value,
+    textarea,
     input{
         background-color: transparent;
         border:0;
@@ -70,6 +96,9 @@ const StyledInputContainer = styled.div`
         border-bottom:2px solid ${props => props.theme.color.gray800};
         font-size:${props => props.theme.font.size.paragraph2};
         color:${props => props.theme.color.foreground};
+    }
+    .value{
+        border-bottom:0;
     }
     .radio-container{
         display: flex;

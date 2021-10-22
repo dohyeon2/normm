@@ -8,9 +8,14 @@ function useRedirect() {
         if (to !== history.location.pathname) {
             setLoading(true);
             setTimeout(() => {
-                history.push(to);
+                if(to === -1){
+                    history.goBack();
+                }else{
+                    history.push(to);
+                }
             }, 400);
         }
+        
     }
     return { setPush };
 }
