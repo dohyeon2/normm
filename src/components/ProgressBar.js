@@ -25,6 +25,7 @@ const StyledProgressBarContainer = styled.div`
         font-size:${props => props.theme.font.size.paragraph2};
         position:absolute;
         right:1rem;
+        z-index:2;
     }
     .caption-2{
         font-size:${props => props.theme.font.size.paragraph2};

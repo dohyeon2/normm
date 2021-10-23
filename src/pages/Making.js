@@ -10,6 +10,7 @@ import useLoading from '../hook/useLoading';
 import { useParams } from 'react-router';
 import useIWC from '../hook/useIWC';
 import useCnadidate from '../hook/useCandidate';
+import useRedirect from '../hook/useRedirect';
 
 function Making() {
     const params = useParams();
@@ -35,6 +36,7 @@ function Making() {
     const { setLoading } = useLoading();
     const [input, setInput] = useState(INITIAL_INPUT);
     const [state, setState] = useState(INITIAL_STATE);
+    const { setPush } = useRedirect();
     const submitEventHandler = async (e) => {
         e.preventDefault();
         const requestData = {
@@ -48,7 +50,12 @@ function Making() {
                 title: x.name,
             })),
         };
-        const res = await createIWC(requestData);
+        try {
+            const res = await createIWC(requestData);
+            setPush('/');
+        } catch (e) {
+
+        }
     }
     const onInput = (e) => {
         const curr = e.target;
@@ -198,7 +205,6 @@ function Making() {
     }, []);
 
     useEffect(() => {
-        console.log(input);
         if (validateInput(input, validateHandler)) {
             setState(s => ({
                 ...s,

@@ -2,18 +2,18 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import useLoading from '../hook/useLoading';
 import useIWC from '../hook/useIWC';
-import { ShareBtn, StyledTransprentBtn } from '../components/Btns';
-import Input from '../components/Input';
-import { Author } from '../components/Profile';
-import { IconBtn } from '../components/Btns';
-import { StyledList, StyledSubmitBtn } from './Making';
-import Container from '../components/Container';
-import Comment, { CommentEditor } from '../components/Comment';
+import { ShareBtn, StyledTransprentBtn } from './Btns';
+import Input from './Input';
+import { Author } from './Profile';
+import { IconBtn } from './Btns';
+import { StyledList, StyledSubmitBtn } from '../pages/Making';
+import Container from './Container';
+import Comment, { CommentEditor } from './Comment';
 import useComment from '../hook/useComment';
-import Candidate from '../components/Candidate';
+import Candidate from './Candidate';
 import useCnadidate from '../hook/useCandidate';
-import { ImageEnlargeModal } from '../components/Modal';
-import ShiningEffect from '../components/Effect';
+import { ImageEnlargeModal } from './Modal';
+import ShiningEffect from './Effect';
 
 function Statistic({
   data
@@ -467,7 +467,7 @@ const StyledStatistic = styled.div`
         border-radius:50px;
         font-size:${props => props.theme.font.size.paragraph4};
         font-weight:${props => props.theme.font.weight.extraBold};
-        color ${props => props.theme.color.foreground};
+        color: ${props => props.theme.color.foreground};
       }
     }
   }

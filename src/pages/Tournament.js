@@ -4,11 +4,11 @@ import useTournament from '../hook/useTournament';
 import useLoading from '../hook/useLoading';
 import styled from 'styled-components';
 import Competitor from '../components/Competitor';
-import Statistic from './Statistic';
+import Statistic from '../components/Statistic';
 
 function Tournament() {
     const { id } = useParams();
-    const { getTournament, updateTournament, setTournamentData, tournamentData  } = useTournament();
+    const { getTournament, updateTournament, setTournamentData, tournamentData } = useTournament();
     const { setLoading } = useLoading();
     const timedout = useRef(false);
     const timeoutHandler = useRef(null);
@@ -47,6 +47,14 @@ function Tournament() {
             clearInterval(timeoutHandler.current);
         }
     }, [state.loading]);
+    useEffect(() => {
+        window.onresize = () => {
+            
+        };
+        return () => {
+            window.onresize = null;
+        }
+    }, []);
     if (state.loading || !state.data) return null;
     if (state.data.tournament.is_done) return (
         <Statistic data={state.data.tournament} />
@@ -117,6 +125,7 @@ const StyledTournament = styled.div`
     transform:scale(1);
     transition: opacity .5s ease-in-out, transform .5s ease-in-out;
     opacity: 1;
+    height:100%;
     position:relative;
     /* .competitor{
         position:absolute;

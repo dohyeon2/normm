@@ -96,6 +96,10 @@ const StyledInputContainer = styled.div`
         border-bottom:2px solid ${props => props.theme.color.gray800};
         font-size:${props => props.theme.font.size.paragraph2};
         color:${props => props.theme.color.foreground};
+        &:focus{
+            outline:0;
+            border-bottom-color: ${props => props.theme.color.primary};
+        }
     }
     .value{
         border-bottom:0;

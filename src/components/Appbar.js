@@ -9,7 +9,19 @@ import { useHistory } from 'react-router';
 function Appbar() {
     const history = useHistory();
     const { tournamentData } = useTournament();
-    if (!tournamentData?.tournament?.is_done && history.location.pathname.split('/')[1] === "tournament") {
+    const currentPage = history.location.pathname.split('/')[1] === "tournament";
+
+    if (!tournamentData?.tournament?.is_done && currentPage) {
+        const tournament = tournamentData?.tournament;
+        const getRoundName = (round) => {
+            if (round > 4) {
+                return round + "강";
+            }
+            if (round > 2) {
+                return "준결승";
+            }
+            return "결승";
+        }
         return (
             <StyledAppbar id="appbar">
                 <div className="left">
@@ -20,10 +32,19 @@ function Appbar() {
                             </svg>
                         </div>
                     </CustomLink>
-                    <div className="IWC-title">{tournamentData?.tournament?.IWC_title}</div>
+                    <div className="IWC-title">{tournament?.IWC_title}</div>
                 </div>
                 <div className="right">
-                    <Profile />
+                    <div className="round-indicator">
+                        <div className="current-round">
+                            {getRoundName(tournament?.current_round)}
+                        </div>
+                        <div className="line"></div>
+                        <div className="current-match">
+                            {tournament?.match_count} /
+                            {tournament?.all_match_count}
+                        </div>
+                    </div>
                 </div>
             </StyledAppbar>
         );
@@ -51,7 +72,7 @@ const StyledAppbar = styled.div`
     position:sticky;
     border-radius:0 0 1.2rem 1.2rem;
     background-color: ${props => props.theme.color.background};
-    z-index:99;
+    z-index:9;
     top:0;
     .left{
         display:flex;
@@ -72,4 +93,27 @@ const StyledAppbar = styled.div`
     @media screen and (min-width:${props => props.theme.mobileBreakPoint}px){
         padding: 40px 50px;
     } */
+    .round-indicator{
+        display:flex;
+        font-size:${props => props.theme.font.size.paragraph2};
+        color: ${props => props.theme.color.foreground};
+        font-weight: ${props => props.theme.font.weight.extraBold};
+        align-items:center;
+        .line{
+            border-top:1px solid ${props => props.theme.color.primary};
+            width:14px;
+        }
+        .current-match,
+        .current-round{
+            padding:.6rem 1.4rem;
+            border-radius:9.9rem;
+        }
+        .current-round{
+            background-color:${props => props.theme.color.primary};
+        }
+        .current-match{
+            border:1px solid ${props => props.theme.color.primary};
+            color: ${props => props.theme.color.secondary};
+        }
+    }
 `;

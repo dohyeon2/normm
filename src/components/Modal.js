@@ -23,7 +23,9 @@ export function ImageModal({
                     <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z" />
                 </svg>
             </button>
-            <img src={src} />
+            <div className="image-wrap">
+                <img src={src} />
+            </div>
             <div className="name">{name}</div>
         </StyledCompetitorModal>
     )
@@ -80,8 +82,9 @@ const StyledCompetitorModal = styled.div`
     bottom:0;
     z-index:99;
     overflow-y:auto;
-    background-color:rgba(0,0,0,.7);
+    background-color:rgba(0,0,0,.8);
     .close-btn{
+        z-index:2;
         padding:0;
         margin:0;
         background-color:transparent;
@@ -90,16 +93,27 @@ const StyledCompetitorModal = styled.div`
         right:2rem;
         top:2rem;
         cursor:pointer;
-        filter:drop-shadow(3px 3px 4px rgba(0,0,0,));
+        filter:drop-shadow(3px 3px 4px rgba(0,0,0));
         path{
             fill:#fff;
         }
     }
+    .image-wrap{
+        position:absolute;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+        width:100%;
+        height:100%;
+        pointer-events: none;
+    }
     img{
+        pointer-events: auto;
         display:block;
         width:calc(100% - 4rem);
         margin:4rem auto;
         max-width:1280px;
+        border-radius:0.5rem;
     }
     .name{
         z-index:2;

@@ -10,6 +10,7 @@ function Competitor({
     side,
     winnerSide,
     imageReadyHandler,
+    style,
     setPick = () => { }
 }) {
     const pickBtnClickHandler = () => {
@@ -29,9 +30,9 @@ function Competitor({
         }
     }
     return (
-        <StyledCompetitor className={competitorClass.join(" ")}>
-            <ImageEnlargeModal src={src} name={name}>
-                <ShiningEffect start={winner} passive={false}>
+        <ShiningEffect start={winner} passive={false}>
+            <StyledCompetitor className={competitorClass.join(" ")} style={style}>
+                <ImageEnlargeModal src={src} name={name}>
                     <div className='image'
                         style={{
                             backgroundImage: `url(${src})`
@@ -40,16 +41,14 @@ function Competitor({
                         <img className="img-handler" src={src} alt="" onLoad={imageReadyHandler} />
                         <div className="name">{name}</div>
                     </div>
-                </ShiningEffect>
-            </ImageEnlargeModal>
-            <ShiningEffect start={winner} passive={false}>
+                </ImageEnlargeModal>
                 <StyledPickBtn className={pickBtnClass.join(" ")} onClick={pickBtnClickHandler}>
                     <span>
                         <img src={winner ? "/images/winner_btn.png" : "/images/pick-btn.png"} />
                     </span>
                 </StyledPickBtn>
-            </ShiningEffect>
-        </StyledCompetitor>
+            </StyledCompetitor>
+        </ShiningEffect>
     );
 }
 
@@ -60,6 +59,7 @@ const StyledCompetitor = styled.div`
     flex-direction:column;
     overflow:hidden;
     transition:filter .4s ease-in-out, width .4s ease-in-out;
+    justify-content: space-between;
     box-sizing:border-box;
     position:absolute;
     top:0;
@@ -92,6 +92,7 @@ const StyledCompetitor = styled.div`
         background-size: cover;
         background-position:center;
         flex-grow:1;
+        height:100%;
         cursor:zoom-in;
         box-sizing:border-box;
         overflow:hidden;
@@ -126,7 +127,7 @@ const StyledCompetitor = styled.div`
     }
     &.winner{
         border:0;
-        border-radius:2.2rem 2.2rem 0 0;
+        border-radius:2.2rem;
         z-index:2;
         width:100%;
         .image{

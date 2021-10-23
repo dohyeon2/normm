@@ -4,6 +4,7 @@ import Input from './Input';
 import { RoundBtn } from './Btns';
 import ProgressBar from './ProgressBar';
 import ShiningEffect from '../components/Effect';
+import { ImageEnlargeModal } from '../components/Modal';
 
 function Candidate({
     theme = "making",
@@ -31,13 +32,15 @@ function Candidate({
         case "ranking":
             return (<StyledCandidate className={classList} >
                 <div className="ranking">{idx + 1}</div>
-                <ShiningEffect start={!highlighted} passive={highlighted}>
-                    <div className={["image", (highlighted ? "highlighted" : "")].join(" ")} style={{
-                        backgroundImage: `url(${src})`,
-                    }}>
-                        {highlighted && <img className="my-pick-icon" src="/images/my_pick_icon.png" />}
-                    </div>
-                </ShiningEffect>
+                <ImageEnlargeModal src={src} name={name}>
+                    <ShiningEffect start={!highlighted} passive={highlighted}>
+                        <div className={["image", (highlighted ? "highlighted" : "")].join(" ")} style={{
+                            backgroundImage: `url(${src})`,
+                        }}>
+                            {highlighted && <img className="my-pick-icon" src="/images/my_pick_icon.png" />}
+                        </div>
+                    </ShiningEffect>
+                </ImageEnlargeModal>
                 <div className="info">
                     <Input label="이름" value={name} onInput={nameChangeHandler} theme={"readonly"} />
 
