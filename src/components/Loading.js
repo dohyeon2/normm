@@ -48,6 +48,7 @@ const StyledLoadingContainer = styled.div`
         max-height: 300px;
     }
     &.loading{
+        pointer-events: auto;
         opacity: 1;
     }
 `;

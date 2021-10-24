@@ -11,8 +11,17 @@ import Making from "./pages/Making";
 import Tournament from './pages/Tournament';
 import Loading from "./components/Loading";
 import GlobalComponents from "./components/GlobalComponents";
+import Statistic from "./pages/Statistic";
+import { Error404 } from "./pages/ErrorPage";
+import useUser from "./hook/useUser";
+import { useEffect } from "react";
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
+  const { refreshUser } = useUser();
+  useEffect(() => {
+    refreshUser();
+  }, []);
   return (
     <ThemeProvider theme={defaultTheme}>
       <StyledAppContainer id="app">
@@ -27,11 +36,23 @@ function App() {
           <Route path="/tournament/:id">
             <Tournament />
           </Route>
+          <Route path="/statistic/:id">
+            <Statistic />
+          </Route>
           <Route path="/loading">
             <Loading />
           </Route>
-          <Route path="/">
+          <Route path="/404">
+            <Error404 />
+          </Route>
+          <Route path="/adminLogin">
+            <AdminLogin />
+          </Route>
+          <Route path="/" exact>
             <Main />
+          </Route>
+          <Route path="*">
+            <Error404 />
           </Route>
         </Switch>
         <GlobalComponents />

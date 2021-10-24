@@ -14,7 +14,7 @@ const SET_MODAL = 'global/SET_MODAL';
 
 export const setLoading = (loading) => ({ type: SET_LOADING, payload: loading });
 export const setTournamentData = (data) => ({ type: SET_TOURNAMNET_DATA, payload: data });
-export const setModal = (on, src, name) => ({ type: SET_MODAL, payload: { on: on, src: src, name: name } })
+export const setModal = (on, data, modalType = 'modal') => ({ type: SET_MODAL, payload: { on: on, data: data, modalType: modalType } })
 
 export default function globalReducer(state = INITIAL_STATE, action) {
     switch (action.type) {
@@ -31,8 +31,8 @@ export default function globalReducer(state = INITIAL_STATE, action) {
         case SET_MODAL:
             return {
                 ...state,
-                modal: {
-                    ...state.modal,
+                [action.payload.modalType]: {
+                    ...state[action.payload.modalType],
                     ...action.payload,
                 }
             };

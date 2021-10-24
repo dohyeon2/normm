@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Thumbnail, StyledTitle } from './IWC';
-import { StyledSubmitBtn } from '../pages/Making';
+import { StyledSubmitBtn } from '../components/Btns';
 import Select from './Select';
 import useGlobal from '../hook/useGlobal';
 
@@ -129,6 +129,7 @@ const StyledCompetitorModal = styled.div`
     }
 `;
 
+
 const StyledSubmitBtnIWCModal = styled(StyledSubmitBtn)`
     margin:0;
     width:100%;
@@ -177,7 +178,10 @@ export const ImageEnlargeModal = (attr) => {
     } = attr;
     const { setModal } = useGlobal();
     const openPopup = () => {
-        setModal(true, src, name);
+        setModal(true, {
+            src: src,
+            name: name,
+        });
     }
     return ((() => {
         return React.cloneElement(children, {

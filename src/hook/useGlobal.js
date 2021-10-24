@@ -3,8 +3,9 @@ import { useDispatch } from 'react-redux';
 
 function useGlobal() {
     const dispatch = useDispatch();
-    const setModal = (on, src, name) => {
-        dispatch(modalHandler(on, src, name));
+    const setModal = (on, data, modalType) => {
+        dispatch(modalHandler(on, data, modalType));
+        console.log(data);
     }
     return { setModal };
 }

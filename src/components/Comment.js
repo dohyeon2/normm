@@ -5,6 +5,7 @@ import Input, { StyledLabel } from './Input';
 import Collapse from './Util';
 import { IconBtn } from './Btns';
 import useComment from '../hook/useComment';
+import useUser from '../hook/useUser';
 
 export function CommentEditor({
   submitCommentHandler,
@@ -13,7 +14,7 @@ export function CommentEditor({
     canSubmit: false,
     value: "",
   };
-
+  const { user } = useUser();
   const [state, setState] = useState(INITIAL_STATE);
   const submitBtnOnHandler = (e) => {
     const value = e.target.value;
@@ -49,8 +50,8 @@ export function CommentEditor({
           commentSubmit();
         }
       }}>
-        <Profile onlyImage={true} size={'5rem'} />
-        <Input theme="textarea" label={"익명"} placeholder="댓글 입력" onInput={submitBtnOnHandler} value={state.value} />
+        <Profile id={user?.id} image={user?.profile_image} onlyImage={true} size={'5rem'} />
+        <Input theme="textarea" label={user?.name || "익명"} placeholder="댓글 입력" onInput={submitBtnOnHandler} value={state.value} />
       </StyledComment>
       <Collapse collapse={!state.canSubmit} className="comment-btn-container">
         <StyledSubmitBtn onClick={commentSubmit}>등록</StyledSubmitBtn>
@@ -60,15 +61,22 @@ export function CommentEditor({
 };
 
 function Comment({
+  image,
   name = "name",
   content = "content",
   id,
   array_idx,
+  isUserLiked,
   liked,
   collapse: collapseOn,
   inViewPort = true
 }) {
   const { reactionComment } = useComment();
+  const { user } = useUser();
+  const [state, setState] = useState({
+    isUserLiked: isUserLiked,
+    liked: liked,
+  });
   const [collapse, setCollapse] = useState(true);
   useEffect(() => {
     inViewPort && setTimeout(() => {
@@ -76,21 +84,24 @@ function Comment({
     }, (200 * array_idx));
   }, []);
   const reacttionHandler = (type) => async () => {
-    try {
-      await reactionComment(id, type);
-    } catch (e) {
-      window.alert(e.response.data);
+    if (type === "liked") {
+      if (!user) return;
+      setState(s => ({
+        isUserLiked: !s.isUserLiked,
+        liked: s.liked + (s.isUserLiked ? -1 : 1)
+      }));
     }
+    await reactionComment(id, type);
   }
   return (
     <Collapse collapse={collapseOn ? collapse : false}>
       <StyledComment>
-        <Profile onlyImage={true} size={'5rem'} />
+        <Profile image={image} onlyImage={true} size={'5rem'} />
         <div className="content-container">
           <StyledLabel className="name">{name}</StyledLabel>
           <div className="content">{content}</div>
           <div className="reaction">
-            <IconBtn iconType="like" onClick={reacttionHandler('liked')}>{liked}</IconBtn>
+            <IconBtn iconType="like" onClick={reacttionHandler('liked')}>{state.liked}</IconBtn>
             <IconBtn iconType="report" onClick={reacttionHandler('report')}>신고</IconBtn>
           </div>
         </div>

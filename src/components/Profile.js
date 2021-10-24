@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import useUser from '../hook/useUser';
 
 export function Author({
     image,
@@ -15,21 +17,36 @@ export function Author({
 
 function Profile({
     onlyImage,
+    id = 0,
+    image = "/images/default_profile.png",
     size
 }) {
+    const { getUser } = useUser();
     const INITIAL_STATE = {
-        image: "/images/default_profile.png",
+        image: image || "/images/default_profile.png",
         name: "익명",
     };
-    const [state] = useState(INITIAL_STATE);
+    const [state, setState] = useState(INITIAL_STATE);
+    useEffect(() => {
+        if (id) {
+            (async () => {
+                const res = await getUser(id);
+                setState(s => ({
+                    ...s,
+                    image: res?.profile_image,
+                    name: res?.name,
+                }));
+            })();
+        }
+    }, [id]);
     return (
         <StyledProfile className="profile">
             {!onlyImage && <div className="name">
                 {state.name}
             </div>}
             <div className="image" style={{
-                width:size,
-                height:size,
+                width: size,
+                height: size,
             }}>
                 <img src={state.image} alt="" />
             </div>
@@ -48,6 +65,8 @@ const StyledAuthor = styled.div`
         border-radius: 99px;
         background-color: ${props => props.theme.color.gray100};
         margin-right:0.65rem;
+        background-size: cover;
+        background-position: center;
     }
     .author-name{
         font-size:${props => props.theme.font.size.paragraph2};

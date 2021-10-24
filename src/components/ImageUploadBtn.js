@@ -10,7 +10,7 @@ function ImageUploadBtn({
     callbackAfterUpload
 }) {
     const fileInput = useRef();
-    const idx = useRef(startId);
+    const idx = useRef(startId + 1);
     const CAPTIONS = {
         ready: "클릭하여 업로드",
     };
@@ -82,6 +82,9 @@ function ImageUploadBtn({
             }));
         }
     }, []);
+    useEffect(() => {
+        idx.current = startId + 1;
+    }, [startId]);
     return (
         <StyledImageUploadBtnContainer className={[...classList, state.state]}>
             <div

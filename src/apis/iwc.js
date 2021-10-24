@@ -4,7 +4,11 @@ import API from '../vars/api';
 const IWC_API = API.IWC;
 
 export const createIWC = async (data) => {
-    const res = await axios.post(IWC_API, data);
+    const res = await axios.post(IWC_API, data, {
+        headers: {
+            Authorization: "Bearer " + localStorage.getItem("normm_token"),
+        }
+    });
     return res;
 }
 

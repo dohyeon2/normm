@@ -14,20 +14,27 @@ import Candidate from './Candidate';
 import useCnadidate from '../hook/useCandidate';
 import { ImageEnlargeModal } from './Modal';
 import ShiningEffect from './Effect';
+import useGlobal from '../hook/useGlobal';
+import useUser from '../hook/useUser';
 
-function Statistic({
-  data
+function StatisticComponent({
+  data,
+  IWC = null
 }) {
   const INITIAL_STATE = {
-    loading: true,
+    loading: IWC ? false : true,
     commentsLoading: true,
     statisticLoading: true,
-    data: null,
+    data: IWC || null,
     error: false,
     page: 1,
     statisticPage: 1,
     search: null,
   };
+  if (IWC !== null) {
+    data = {};
+    data.IWC = IWC.IWC.id;
+  }
   const INITIAL_SECTION = {
     comment: false,
     statistic: false,
@@ -40,8 +47,14 @@ function Statistic({
   const commentSection = useRef(null);
   const { getCandidates, searchCandidates } = useCnadidate();
   const { insertComment, getComment } = useComment();
-  const { getIWC } = useIWC();
+  const { getIWC, reactionIWC } = useIWC();
   const { setLoading } = useLoading();
+  const { setModal } = useGlobal();
+  const { user } = useUser();
+  const [likedCount, setLikedCount] = useState({
+    count: 0,
+    isUserLiked: false,
+  });
   const [state, setState] = useState(INITIAL_STATE);
   const [comments, setComments] = useState([]);
   const [candidates, setCandidates] = useState({
@@ -96,20 +109,28 @@ function Statistic({
     if (state.loading) {
       (async () => {
         const IWCRes = await getIWC({
-          id: data.IWC
+          id: data?.IWC || IWC?.id
         });
         setState(s => ({
           ...s,
           data: IWCRes.data,
           loading: false,
         }));
+        console.log(IWCRes.data.IWC.liked_count);
+        setLikedCount(s => (
+          {
+            ...s,
+            isUserLiked: IWCRes.data.IWC.isUserLiked,
+            count: IWCRes.data.IWC.liked_count,
+          }
+        ));
         setLoading(false);
       })();
     }
     if (state.commentsLoading) {
       (async () => {
         const commentRes = await getComment({
-          post_id: data.IWC,
+          post_id: data?.IWC,
           paged: state.page
         });
         setComments(commentRes.data);
@@ -131,7 +152,7 @@ function Statistic({
     if (state.statisticLoading) {
       (async () => {
         const candidatesRes = await getCandidates({
-          post_id: data.IWC,
+          post_id: data?.IWC || IWC?.id,
           paged: state.statisticPage
         });
         setCandidates(candidatesRes?.data);
@@ -177,6 +198,9 @@ function Statistic({
     }));
   }
   const submitCommentHandler = async (value) => {
+    const author = user || {
+      name: "익명"
+    };
     try {
       const res = await insertComment(state.data.IWC.id, value);
       setComments(s => ({
@@ -186,15 +210,14 @@ function Statistic({
             id: res.data.id,
             date: Date.now(),
             content: value,
-            author: {
-              name: "익명"
-            }
+            author: author,
+            liked: 0,
           },
           ...s.comments,
         ]
       }));
     } catch (e) {
-      e?.respone?.data?.message && window.alert(e.respone.data.message);
+      e?.respone?.data?.message && window.alert(e?.respone?.data?.message);
     }
   };
   const searchCandidatesHandler = async (e) => {
@@ -210,22 +233,48 @@ function Statistic({
     setCandidates(res.data);
   }
   if (state.loading || !state.data) return null;
+  const IsWinner = data?.winner;
   return (
     <StyledStatistic>
-      <ImageEnlargeModal src={data.winner.src} name={data.winner.name}>
-        <ShiningEffect start={false} passive={true} duration={6} intense={0.3}>
-          <div className="winner" ref={winnerRef} style={{
-            backgroundImage: `url("${data.winner.src}")`
-          }}>
-            <div className="winner-name">
-              <img className="my-pick-icon" src="/images/my_pick_icon.png" alt="" />
-              <span>
-                <span>{data.winner.name}</span>
-              </span>
+      {IsWinner ?
+        <ImageEnlargeModal src={data?.winner.src} name={data?.winner.name}>
+          <ShiningEffect start={false} passive={true} duration={6} intense={0.3}>
+            <div className="winner" ref={winnerRef} style={{
+              backgroundImage: `url("${data.winner.src}")`
+            }}>
+              <div className="winner-name">
+                <img className="my-pick-icon" src="/images/my_pick_icon.png" alt="" />
+                <span>
+                  <span>{data.winner.name}</span>
+                </span>
+              </div>
             </div>
+          </ShiningEffect>
+        </ImageEnlargeModal>
+        :
+        <ShiningEffect start={false} passive={true} duration={6} intense={0.3}>
+          <div className="winner" ref={winnerRef}>
+            <div className="thumbnail_left"
+              style={{
+                backgroundImage: `url(${IWC.IWC.thumbnail_left})`,
+              }}
+            ></div>
+            <div className="thumbnail_right"
+              style={{
+                backgroundImage: `url(${IWC.IWC.thumbnail_right})`,
+              }}
+            ></div>
+            <div></div>
+            <button className="play-btn" onClick={() => {
+              setModal(true, IWC.IWC, 'IWCmodal');
+            }}>
+              <span>
+                <IconBtn iconType="play"></IconBtn>PLAY
+              </span>
+            </button>
           </div>
         </ShiningEffect>
-      </ImageEnlargeModal>
+      }
       <div className="statistic" ref={infoSection}>
         <button className="to-bottom-btn" onClick={toSectionClickHandler(infoSection.current)}>
           <img src="/images/bottom-icon.png" alt="" />
@@ -249,9 +298,25 @@ function Statistic({
           <div className="maker-reaction">
             <Author {...state.data.IWC.author} />
             <div className="reaction">
-              <IconBtn iconType="play">{0}</IconBtn>
-              <IconBtn iconType="like">{0}</IconBtn>
-              <IconBtn iconType="report">신고</IconBtn>
+              <IconBtn iconType="play">{state.data.IWC.play_count}</IconBtn>
+              <IconBtn iconType="like" onClick={() => {
+                if(!user) return;
+                let temp = likedCount.count;
+                if (likedCount.isUserLiked) {
+                  temp--;
+                } else {
+                  temp++;
+                }
+                setLikedCount(s => ({
+                  ...s,
+                  count: temp,
+                  isUserLiked: !s.isUserLiked
+                }));
+                reactionIWC(state.data.IWC.id, 'liked');
+              }}>{likedCount.count}</IconBtn>
+              <IconBtn iconType="report" onClick={() => {
+                reactionIWC(state.data.IWC.id, 'reported');
+              }}>신고</IconBtn>
             </div>
           </div>
 
@@ -272,7 +337,7 @@ function Statistic({
                 <CommentEditor submitCommentHandler={submitCommentHandler} />
               </div>
               <div>
-                {comments?.comments?.map((x, i) => <Comment collapse={false} array_idx={i} key={x.id} content={x.content} id={x.id} liked={x.liked} name={x.author.name} />)}
+                {comments?.comments?.map((x, i) => <Comment image={x.author.profile_image} {...x} collapse={false} array_idx={i} key={x.id} content={x.content} id={x.id} liked={x.liked} name={x.author.name} />)}
               </div>
               <div className="page-indicator">
                 {pageList.map((x, i) => <StyledIndicator className={x === comments.current_page * 1 ? "current" : ""} key={i} onClick={getCommentByPage(x)}>{x}</StyledIndicator>)}
@@ -286,7 +351,7 @@ function Statistic({
                 {candidates?.candidates?.map((candidate, idx) =>
                   <Candidate
                     idx={(state.statisticPage - 1) * 10 + idx}
-                    highlighted={data?.winner.id === candidate.id}
+                    highlighted={IWC === null && data?.winner.id === candidate.id}
                     key={candidate.id}
                     theme="ranking"
                     src={candidate.src}
@@ -306,7 +371,7 @@ function Statistic({
   );
 }
 
-export default Statistic;
+export default StatisticComponent;
 
 const StyledListStatistic = styled(StyledList)`
     label{
@@ -382,7 +447,11 @@ const StyledStatistic = styled.div`
     margin-bottom:2rem;
   }
   .reaction{
+    margin-top:0.5rem;
     display:flex;
+    .content{
+      margin-top:0;
+    }
     .icon{
       height:18px;
     }
@@ -406,6 +475,21 @@ const StyledStatistic = styled.div`
     justify-content:center;
     border:4px solid ${props => props.theme.color.primary};
     box-sizing:border-box;
+    .thumbnail_right,
+    .thumbnail_left{
+      height:100%;
+      width:50%;
+      background-size:cover;
+      background-position:center;
+    }
+    .play-btn{
+      border:0;
+      cursor:pointer;
+      .icon{
+        height:${props => props.theme.font.size.paragraph3};
+      }
+    }
+    .play-btn,
     .winner-name{
       &::before{
         content:"";

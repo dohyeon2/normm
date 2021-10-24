@@ -3,8 +3,10 @@ import API from '../vars/api';
 import useLoading from './useLoading';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTournamentData as setTournament } from '../redux/global';
+import useUser from './useUser';
 
 function useTournament() {
+    const { AuthorizationHeader, user } = useUser();
     const { globalReducer } = useSelector(s => s);
     const tournamentData = globalReducer.tournamentData;
     const dispatch = useDispatch();
@@ -18,6 +20,10 @@ function useTournament() {
             const IWCTournament = await axios.post(API.IWCTournament, {
                 IWCId: id,
                 round: round
+            }, {
+                headers: user && {
+                    ...AuthorizationHeader,
+                }
             });
             return IWCTournament;
         } catch (e) {

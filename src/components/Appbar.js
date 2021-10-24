@@ -5,9 +5,12 @@ import Profile from './Profile';
 import useTournament from '../hook/useTournament';
 import CustomLink from './CustomLink';
 import { useHistory } from 'react-router';
+import { LoginBtn } from './Btns';
+import useUser from '../hook/useUser';
 
 function Appbar() {
     const history = useHistory();
+    const { user } = useUser();
     const { tournamentData } = useTournament();
     const currentPage = history.location.pathname.split('/')[1] === "tournament";
 
@@ -55,7 +58,7 @@ function Appbar() {
                 <Logo />
             </div>
             <div className="right">
-                <Profile />
+                {user ? <Profile id={user.id} /> : <LoginBtn />}
             </div>
         </StyledAppbar>
     );

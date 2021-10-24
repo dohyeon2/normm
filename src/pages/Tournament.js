@@ -4,7 +4,7 @@ import useTournament from '../hook/useTournament';
 import useLoading from '../hook/useLoading';
 import styled from 'styled-components';
 import Competitor from '../components/Competitor';
-import Statistic from '../components/Statistic';
+import Statistic from '../components/StatisticComponent';
 
 function Tournament() {
     const { id } = useParams();

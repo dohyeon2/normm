@@ -11,8 +11,10 @@ import { useParams } from 'react-router';
 import useIWC from '../hook/useIWC';
 import useCnadidate from '../hook/useCandidate';
 import useRedirect from '../hook/useRedirect';
+import useUser from '../hook/useUser';
 
 function Making() {
+    const { user } = useUser();
     const params = useParams();
     const { getCandidates } = useCnadidate();
     const { getIWC } = useIWC();
@@ -180,6 +182,11 @@ function Making() {
             (async () => {
                 const id = params.id;
                 const IWC = await getIWC({ id: id });
+                if (IWC?.data?.IWC?.author?.id !== user.id) {
+                    window.alert('권한이 없습니다.');
+                    setPush("/");
+                    return;
+                }
                 const candidates = await getCandidates({ post_id: id, nopaging: true });
                 setInput(s => ({
                     ...s,
@@ -217,7 +224,6 @@ function Making() {
             }));
         }
     }, [input]);
-
     return (
         <StyledMaking>
             <Container>

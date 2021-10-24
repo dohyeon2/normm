@@ -4,31 +4,33 @@ import Tag from '../components/Tag';
 import { readIWC } from '../apis/iwc';
 import IWC from '../components/IWC';
 import { useHistory } from 'react-router';
-import IWCmodal from '../components/Modal';
 import useLoading from '../hook/useLoading';
-import useTournament from '../hook/useTournament';
 import useRedirect from '../hook/useRedirect';
+import useGlobal from '../hook/useGlobal';
+import useIWC from '../hook/useIWC';
 
-function makeTagObject(label, checked = false) {
+function makeTagObject(label, checked = false, onClick = () => { }) {
     return {
         label: label,
         checked: checked,
+        onClick: onClick
     }
 }
 
 function Main() {
     const { setLoading } = useLoading();
     const { setPush } = useRedirect();
-    const { generateIWCTournament } = useTournament();
-    const TAG_LIST = [
-        makeTagObject("#랜덤"),
-        makeTagObject("#인기순"),
-        makeTagObject("#최신순"),
-        makeTagObject("#좋아요_누른_월드컵"),
-        makeTagObject("#댓글_단_월드컵"),
-        makeTagObject("#내가_만든_월드컵"),
-        makeTagObject("#내_친구가_만든_월드컵"),
-    ];
+    const { setModal } = useGlobal();
+    const { getIWC } = useIWC();
+    const TAG_LIST = {
+        0: makeTagObject("#랜덤"),
+        1: makeTagObject("#인기순"),
+        2: makeTagObject("#최신순"),
+        3: makeTagObject("#좋아요_누른_월드컵"),
+        4: makeTagObject("#댓글_단_월드컵"),
+        5: makeTagObject("#내가_만든_월드컵"),
+        6: makeTagObject("#내_친구가_만든_월드컵"),
+    };
     const INITIAL_STATE = {
         tagList: TAG_LIST,
         loading: false,
@@ -48,22 +50,6 @@ function Main() {
     const [state, setState] = useState(INITIAL_STATE);
     const [search, setSearchState] = useState(INITIAL_SEARCH_STATE);
     const history = useHistory();
-    const onPopup = (e, IWC) => {
-        setState(s => ({
-            ...s,
-            popup: IWC,
-        }));
-    }
-    const closePopup = () => {
-        setState(s => ({
-            ...s,
-            popup: false,
-        }))
-    }
-    const startTournament = async (idx, round) => {
-        const res = await generateIWCTournament(idx, round);
-        setPush('/tournament/' + res.data.tournament_id);
-    }
     useEffect(() => {
         if (state.data === null) {
             setState(s => ({
@@ -137,16 +123,34 @@ function Main() {
         }
     };
     const isSearched = (search.on && search.data);
+    const toInfo = (id) => () => {
+        setPush('/statistic/' + id);
+    }
     return (
         <StyledMain>
             <div className="tag-container">
-                {state.tagList?.map((tag, idx) => <Tag key={idx} label={tag.label} />)}
+                {Object.keys(state?.tagList).map((idx) => {
+                    const tag = state?.tagList[idx];
+                    return <Tag key={idx} label={tag.label} checked={tag.checked} onClick={() => {
+                        setState(s => ({
+                            ...s,
+                            tagList: {
+                                ...s.tagList,
+                                [idx]: {
+                                    ...tag,
+                                    checked: !tag.checked,
+                                }
+                            }
+                        }));
+                        tag.onClick();
+                    }} />
+                }
+                )}
             </div>
             <div className="iwc-list">
-                {!isSearched && state.data?.posts?.map(x => <IWC key={x.id} {...x} onClick={(e) => { onPopup(e, x) }} />)}
-                {isSearched && search.data?.posts?.map(x => <IWC key={x.id} {...x} onClick={(e) => { onPopup(e, x) }} />)}
+                {!isSearched && state.data?.posts?.map(x => <IWC key={x.id} {...x} toInfo={toInfo(x.id)} onClick={(e) => { setModal(true, x, 'IWCmodal'); }} />)}
+                {isSearched && search.data?.posts?.map(x => <IWC key={x.id} {...x} toInfo={toInfo(x.id)} onClick={(e) => { setModal(true, x, 'IWCmodal') }} />)}
             </div>
-            {state.popup && <IWCmodal {...state.popup} closeModal={closePopup} startTournament={startTournament} />}
             <StyledFloatBtns>
                 <StyledSearchBtn {...searchIconAttr}>
                     <div className="input" ref={inputRef} >
